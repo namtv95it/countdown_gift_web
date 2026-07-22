@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Lọc sản phẩm theo danh mục của sự kiện
-    const eventProducts = products.filter(p => p.categoryId === event.categoryId);
+    const eventProducts = products.filter(p => p.categoryIds && p.categoryIds.includes(event.categoryId));
     
     document.getElementById('product-count').innerText = `${eventProducts.length} món`;
 
