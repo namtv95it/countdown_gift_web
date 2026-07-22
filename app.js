@@ -81,6 +81,58 @@ const products = [
     }
 ];
 
+// ──────────────────────────────────────────────────────────────
+// NGÀY LỄ ĐẶC BIỆT — hiển thị theo ngày hiện tại
+// ──────────────────────────────────────────────────────────────
+
+// Các ngày lễ trong năm (month: 1-indexed)
+const specialOccasions = [
+    { id: 'valentine', name: "Valentine 14/2", emoji: "💝", month: 2, day: 14, range: 14, gradient: 'linear-gradient(135deg, #EC4899, #BE185D)', categoryId: 'love' },
+    { id: 'womens_day', name: "Ngày 8/3", emoji: "🌸", month: 3, day: 8, range: 14, gradient: 'linear-gradient(135deg, #F472B6, #A855F7)', categoryId: 'love' },
+    { id: 'mothers_day', name: "Ngày của Mẹ", emoji: "💐", month: 5, day: 12, range: 14, gradient: 'linear-gradient(135deg, #F59E0B, #EF4444)', categoryId: 'birthday' },
+    { id: 'children_day', name: "Tết Thiếu nhi 1/6", emoji: "🎈", month: 6, day: 1, range: 10, gradient: 'linear-gradient(135deg, #3B82F6, #06B6D4)', categoryId: 'birthday' },
+    { id: 'fathers_day', name: "Ngày của Bố", emoji: "👔", month: 6, day: 21, range: 14, gradient: 'linear-gradient(135deg, #1D4ED8, #3B82F6)', categoryId: 'birthday' },
+    { id: 'tet_trung_thu', name: "Tết Trung Thu", emoji: "🥮", month: 9, day: 17, range: 14, gradient: 'linear-gradient(135deg, #F59E0B, #D97706)', categoryId: 'holiday' },
+    { id: 'womens_day_vn', name: "20/10", emoji: "🌺", month: 10, day: 20, range: 14, gradient: 'linear-gradient(135deg, #EC4899, #7C3AED)', categoryId: 'love' },
+    { id: 'teachers_day', name: "Ngày 20/11", emoji: "📚", month: 11, day: 20, range: 14, gradient: 'linear-gradient(135deg, #10B981, #0EA5E9)', categoryId: 'birthday' },
+    { id: 'christmas', name: "Giáng Sinh", emoji: "🎄", month: 12, day: 25, range: 20, gradient: 'linear-gradient(135deg, #EF4444, #16A34A)', categoryId: 'holiday' },
+    { id: 'tet', name: "Tết Nguyên Đán", emoji: "🧧", month: 1, day: 29, range: 21, gradient: 'linear-gradient(135deg, #EF4444, #F59E0B)', categoryId: 'holiday' },
+    { id: 'new_year', name: "Năm Mới", emoji: "🎆", month: 1, day: 1, range: 7, gradient: 'linear-gradient(135deg, #7C3AED, #EC4899)', categoryId: 'holiday' },
+    { id: 'noel_eve', name: "Tất niên", emoji: "🥂", month: 12, day: 31, range: 7, gradient: 'linear-gradient(135deg, #7C3AED, #0EA5E9)', categoryId: 'holiday' },
+];
+
+/**
+ * Tính số ngày còn lại đến ngày lễ.
+ * Trả về số ngày (âm nếu đã qua), dương nếu còn.
+ */
+function daysUntil(month, day) {
+    const now = new Date();
+    const thisYear = new Date(now.getFullYear(), month - 1, day);
+    let diff = Math.ceil((thisYear - now) / (1000 * 60 * 60 * 24));
+    if (diff < -1) {
+        // Thử năm sau
+        const nextYear = new Date(now.getFullYear() + 1, month - 1, day);
+        diff = Math.ceil((nextYear - now) / (1000 * 60 * 60 * 24));
+    }
+    return diff;
+}
+
+/**
+ * Lấy danh sách các ngày lễ sắp đến trong vòng `range` ngày tới.
+ */
+function getUpcomingOccasions() {
+    const upcoming = [];
+    for (const occ of specialOccasions) {
+        const days = daysUntil(occ.month, occ.day);
+        if (days >= 0 && days <= occ.range) {
+            upcoming.push({ ...occ, daysLeft: days });
+        }
+    }
+    // Sắp xếp: ngày gần nhất lên đầu
+    upcoming.sort((a, b) => a.daysLeft - b.daysLeft);
+    return upcoming;
+}
+
 // Trạng thái ứng dụng
 let currentCategory = 'all';
 
@@ -95,9 +147,50 @@ document.addEventListener('DOMContentLoaded', () => {
         currentCategory = categoryParam;
     }
 
+    renderOccasions();
     renderCategories();
     renderProducts();
 });
+
+// Render banners ngày lễ đặc biệt
+function renderOccasions() {
+    const container = document.getElementById('occasion-list');
+    container.innerHTML = '';
+
+    const upcoming = getUpcomingOccasions();
+    if (upcoming.length === 0) return;
+
+    upcoming.forEach(occ => {
+        const btn = document.createElement('button');
+        btn.className = 'occasion-chip flex items-center gap-2 px-4 py-2 rounded-2xl whitespace-nowrap outline-none text-white font-bold text-sm';
+        btn.style.background = occ.gradient;
+        btn.style.boxShadow = '0 4px 14px rgba(0,0,0,0.3)';
+
+        const label = occ.daysLeft === 0
+            ? `Hôm nay!`
+            : occ.daysLeft === 1
+            ? `Còn 1 ngày`
+            : `Còn ${occ.daysLeft} ngày`;
+
+        btn.innerHTML = `
+            <span class="text-base">${occ.emoji}</span>
+            <div class="flex flex-col items-start leading-tight">
+                <span class="text-xs font-extrabold">${occ.name}</span>
+                <span class="text-[10px] opacity-80">${label}</span>
+            </div>
+        `;
+
+        btn.addEventListener('click', () => {
+            // Lọc sản phẩm theo danh mục của ngày lễ
+            currentCategory = occ.categoryId;
+            renderCategories();
+            renderProducts();
+        });
+
+        container.appendChild(btn);
+    });
+}
+
 
 // Render danh sách danh mục
 function renderCategories() {

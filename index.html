@@ -31,17 +31,21 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-darkBase text-white font-sans antialiased selection:bg-brandPurple selection:text-white">
+<body class="bg-transparent text-white font-sans antialiased selection:bg-brandPurple selection:text-white">
 
     <!-- Header Section -->
-    <header class="sticky top-0 z-50 bg-darkBase/80 backdrop-blur-lg border-b border-white/5 pt-4 pb-2">
+    <header class="sticky top-0 z-50 bg-transparent backdrop-blur-lg border-b border-white/5 pt-3 pb-2">
         <div class="container mx-auto px-4">
-            <h1 class="text-xl font-bold mb-4 bg-gradient-to-r from-brandPurple to-brandPink bg-clip-text text-transparent inline-block">
-                <i class="fa-solid fa-gift mr-2 text-brandPink"></i>Khám Phá Quà Tặng
-            </h1>
-            
+
+            <!-- Special Occasion Banners -->
+            <div class="overflow-x-auto pb-2 scrollbar-hide mb-2">
+                <div class="flex space-x-3 w-max" id="occasion-list">
+                    <!-- Occasions will be injected here by JS -->
+                </div>
+            </div>
+
             <!-- Category Filter -->
-            <div class="overflow-x-auto pb-2 scrollbar-hide" id="category-container">
+            <div class="overflow-x-auto pb-2 scrollbar-hide">
                 <div class="flex space-x-3 w-max" id="category-list">
                     <!-- Categories will be injected here by JS -->
                 </div>
@@ -68,3 +72,4 @@
     <script src="app.js"></script>
 </body>
 </html>
+
