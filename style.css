@@ -5,6 +5,11 @@ html, body {
     background: transparent !important;
 }
 
+/* Ensure main content is not overlapped by Flutter app's bottom bar and FAB */
+main {
+    padding-bottom: 300px !important;
+}
+
 /* Hide scrollbar for Chrome, Safari and Opera */
 
 .scrollbar-hide::-webkit-scrollbar {
